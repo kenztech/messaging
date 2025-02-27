@@ -22,7 +22,7 @@ type Config struct {
 }
 
 // NewSystem initializes a new messaging system
-func NewMessageing(cfg Config) *Messaging {
+func NewMessaging(cfg Config) *Messaging {
 	hub := ws.NewHub(cfg.Broker)
 	handler := ws.NewHandler(hub, cfg.Store, cfg.Broker)
 
