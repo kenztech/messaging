@@ -2,9 +2,11 @@ package ws
 
 import (
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/kenztech/messaging/broker"
 	"github.com/kenztech/messaging/models"
@@ -61,10 +63,19 @@ func (h *Handler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get the encoded content from the URL parameter
+	encodedContent := chi.URLParam(r, "content")
+	// Decode the URL-encoded content
+	content, err := url.QueryUnescape(encodedContent)
+	if err != nil {
+		http.Error(w, "Failed to decode message content", http.StatusBadRequest)
+		return
+	}
+
 	message := models.NewMessage(
-		time.Now().String(),
+		uuid.New().String(),
 		senderID,
-		chi.URLParam(r, "content"),
+		content, // Use decoded content
 		r.URL.Query().Get("targetId"),
 		r.URL.Query()["groupId"],
 		time.Now().Unix(),
