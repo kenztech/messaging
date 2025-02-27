@@ -49,6 +49,10 @@ func (h *Hub) Run() {
 				log.Printf("Failed to marshal message: %v", err)
 				continue
 			}
+			// Always send to the sender
+			h.broker.Publish("msg:user:"+message.SenderID, data)
+
+			// Send to target user or groups if specified
 			if message.TargetID != "" {
 				h.broker.Publish("msg:user:"+message.TargetID, data)
 			} else if len(message.GroupIDs) > 0 {
